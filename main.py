@@ -114,8 +114,7 @@ def main():
     
     for i in range(len(pops)):
         ax.plot(pops[i], label="Population {0}".format(i))
-    
-    print(pops)
+
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Population Proportion")
     ax.set_title("Evolution of Neural Network Ecosystem")
