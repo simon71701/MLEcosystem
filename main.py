@@ -56,10 +56,7 @@ def main():
     
     r_scores = np.zeros((len(nets),len(nets)))
     
-    epoch_list = [0]
-    
     for epoch in epochs:
-        epoch_list.append(epoch+1)
         
         for gen in range(gens):
             for i in range(len(nets)):
