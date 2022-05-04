@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Last updated on Mon Apr 18 16:51:51 2022
+Last updated on Wed May 4 18:35:30 2022
 
 @author: simon71701
 """
@@ -63,7 +63,7 @@ class Network(nn.Module):
         
         self.input_layer = nn.Sequential(
                                 nn.Linear(self.num_competitors, self.nodes_per_hidden),
-                                nn.LeakyReLU(),
+                                nn.Tanh(),
                                 nn.Dropout(self.dropout)
         )
         
@@ -111,30 +111,34 @@ def npSoftmax(x):
     f_x = np.exp(x) / np.sum(np.exp(x))
     return f_x
 
-def PredPreyStep(initial_condition, parameters, step):
+def PredPreyStep(initial_condition, parameters, nets, step):
     dots = np.zeros(len(initial_condition))
     final = np.zeros(len(initial_condition))
     
     for i in range(len(initial_condition)):
         for j in range(len(parameters[i])):
-            dots[i] += initial_condition[i]*initial_condition[j]*parameters[i][j]
-        
-        #print(initial_condition[:-1])
-        #dots[i] += parameters[i][-1]*(1-np.sum(initial_condition[:-1]))
+            
+            if i != j:
+                dots[i] += initial_condition[i]*initial_condition[j]*parameters[i][j]
+            
+            if i == j:
+                dots[i] += initial_condition[i]*parameters[i][j]
     
-    #dots[-1] = np.sum(-dots[:-1])
     
     for i in range(len(initial_condition)):
         final[i] = initial_condition[i] + dots[i]*step
+        
+        if nets[i].alive == False:
+            final[i] = 0
+            
         if final[i] < 0:
             final[i] = 0
+            nets[i].alive = False
     
-    #final = npSoftmax(final)
+
     return final
 
 def compileParameters(r_scores):
-    
-    # Param(1,2)= Param(2,1) = AVG(r_scores[1][2],r_scores[2][1])
     
     num_pops = len(r_scores)
 
